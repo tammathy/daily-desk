@@ -59,4 +59,467 @@
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .dark .custom-scroll::-webkit-scrollbar-thumb { background: #475569; }
   </style>
-</
+</head>
+<body class="bg-desk-bg text-desk-text dark:bg-desk-darkbg dark:text-slate-100 min-h-screen antialiased transition-colors duration-200">
+
+  <!-- AUTH SCREEN (Shown if not logged in) -->
+  <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white dark:bg-desk-darkcard p-8 rounded-2xl border border-desk-border dark:border-desk-darkborder shadow-xl">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-xl bg-brand-teal text-white flex items-center justify-center font-heading font-bold text-xl shadow-md shadow-brand-teal/20">
+          DD
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight">Daily Desk</h1>
+          <p class="text-xs text-desk-muted dark:text-slate-400 font-mono">DD Holdings Pilot Portal</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-desk-muted mb-1">Work Email</label>
+          <input type="email" id="auth-email" placeholder="you@company.com" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-desk-muted mb-1">Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal">
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button onclick="signIn()" class="flex-1 bg-brand-teal hover:bg-brand-teal-dark text-white font-medium py-2.5 rounded-lg text-sm transition">Sign In</button>
+          <button onclick="signUp()" class="flex-1 border border-desk-border dark:border-desk-darkborder hover:bg-slate-100 dark:hover:bg-slate-800 font-medium py-2.5 rounded-lg text-sm transition">Sign Up</button>
+        </div>
+        <p id="auth-msg" class="text-xs text-center text-red-500 font-mono mt-2 hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER (Shown when logged in) -->
+  <div id="app-screen" class="hidden min-h-screen flex flex-col">
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-desk-border dark:border-desk-darkborder bg-white dark:bg-desk-darkcard sticky top-0 z-40 px-4 sm:px-6 py-3">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-brand-teal text-white flex items-center justify-center font-heading font-bold text-lg shadow-sm">DD</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-heading font-bold text-lg tracking-tight">Daily Desk</span>
+              <span class="text-xs bg-brand-teal-light text-brand-teal px-2 py-0.5 rounded-full font-mono font-medium">DD Holdings</span>
+            </div>
+            <div class="text-[11px] font-mono text-desk-muted" id="current-date-display"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="toggleDarkMode()" class="p-2 text-desk-muted hover:text-desk-text dark:hover:text-white rounded-lg">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          </button>
+          <div class="flex items-center gap-2 pl-3 border-l border-desk-border dark:border-desk-darkborder">
+            <div class="text-right hidden sm:block">
+              <div id="user-name" class="text-sm font-semibold leading-tight">User</div>
+              <div id="user-role" class="text-[10px] font-mono text-brand-teal uppercase">Team Member</div>
+            </div>
+            <button onclick="signOut()" class="p-2 text-desk-muted hover:text-brand-red rounded-lg" title="Sign Out">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left Column: Personal Desk (Daily, Weekly, Monthly, Ad-hoc) -->
+      <section class="lg:col-span-7 flex flex-col gap-6">
+        
+        <!-- Daily Cadences Card with 5-Weekday Habit Squares -->
+        <div class="bg-white dark:bg-desk-darkcard border border-desk-border dark:border-desk-darkborder rounded-xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4 text-brand-teal"></i>
+              <h2 class="font-heading font-bold text-base">Daily Routines</h2>
+            </div>
+            <span class="text-xs font-mono text-desk-muted">M T W T F</span>
+          </div>
+
+          <div id="daily-tasks-list" class="space-y-3">
+            <!-- Dynamically injected with 5-weekday squares -->
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex gap-2">
+            <input type="text" id="new-daily-input" placeholder="Add daily routine..." class="flex-1 text-sm bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+            <button onclick="addTask('daily')" class="bg-brand-teal hover:bg-brand-teal-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium">Add</button>
+          </div>
+        </div>
+
+        <!-- Weekly & Monthly Cadences Card -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Weekly -->
+          <div class="bg-white dark:bg-desk-darkcard border border-desk-border dark:border-desk-darkborder rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="repeat" class="w-4 h-4 text-brand-teal"></i>
+              <h3 class="font-heading font-bold text-sm">Weekly Focus</h3>
+            </div>
+            <div id="weekly-tasks-list" class="space-y-2 mb-3"></div>
+            <div class="flex gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <input type="text" id="new-weekly-input" placeholder="New weekly item..." class="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg px-2.5 py-1 focus:outline-none">
+              <button onclick="addTask('weekly')" class="bg-brand-teal hover:bg-brand-teal-dark text-white px-2 py-1 rounded-lg text-xs">Add</button>
+            </div>
+          </div>
+
+          <!-- Monthly -->
+          <div class="bg-white dark:bg-desk-darkcard border border-desk-border dark:border-desk-darkborder rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="clock" class="w-4 h-4 text-brand-teal"></i>
+              <h3 class="font-heading font-bold text-sm">Monthly Milestones</h3>
+            </div>
+            <div id="monthly-tasks-list" class="space-y-2 mb-3"></div>
+            <div class="flex gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <input type="text" id="new-monthly-input" placeholder="New monthly item..." class="flex-1 text-xs bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg px-2.5 py-1 focus:outline-none">
+              <button onclick="addTask('monthly')" class="bg-brand-teal hover:bg-brand-teal-dark text-white px-2 py-1 rounded-lg text-xs">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ad-Hoc / Priorities Board -->
+        <div class="bg-white dark:bg-desk-darkcard border border-desk-border dark:border-desk-darkborder rounded-xl p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="check-square" class="w-4 h-4 text-brand-teal"></i>
+              <h2 class="font-heading font-bold text-base">Priorities & Delegated Items</h2>
+            </div>
+          </div>
+          <div id="adhoc-tasks-list" class="space-y-2 mb-4"></div>
+          <div class="flex gap-2">
+            <input type="text" id="new-adhoc-input" placeholder="New priority to-do..." class="flex-1 text-sm bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+            <button onclick="addTask('adhoc')" class="bg-brand-teal hover:bg-brand-teal-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium">Add</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Manager Squad Board (Vertical Delegation) -->
+      <section class="lg:col-span-5 flex flex-col gap-6">
+        <div class="bg-white dark:bg-desk-darkcard border border-desk-border dark:border-desk-darkborder rounded-xl p-5 shadow-sm flex flex-col h-full">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-desk-border dark:border-desk-darkborder">
+            <div class="flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-brand-teal"></i>
+              <h2 class="font-heading font-bold text-base">Direct Reports & Coaching</h2>
+            </div>
+            <button onclick="openInviteModal()" class="text-xs text-brand-teal hover:underline font-mono flex items-center gap-1">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Add Rep
+            </button>
+          </div>
+
+          <!-- Roster Cards Container -->
+          <div id="reps-roster" class="space-y-4 custom-scroll overflow-y-auto flex-1">
+            <!-- Dynamically populated direct report coaching cards -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- INVITE MODAL -->
+  <div id="invite-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-desk-darkcard max-w-sm w-full p-6 rounded-2xl border border-desk-border dark:border-desk-darkborder shadow-xl">
+      <h3 class="font-heading font-bold text-lg mb-2">Invite Team Member</h3>
+      <p class="text-xs text-desk-muted mb-4">Enter your direct report's email address to assign them to your squad board.</p>
+      <input type="email" id="invite-email" placeholder="teammate@company.com" class="w-full text-sm bg-slate-50 dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-1 focus:ring-brand-teal">
+      <div class="flex justify-end gap-2">
+        <button onclick="closeInviteModal()" class="px-3 py-1.5 text-xs font-medium rounded-lg text-desk-muted hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+        <button onclick="assignDirectReport()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-brand-teal hover:bg-brand-teal-dark text-white">Add Direct Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // 1. SUPABASE CLIENT CONFIGURATION
+    const SUPABASE_URL = 'https://crvsmreabyyqoqsseuzr.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_7P7J9ptgIDATy4G3JJxQww_MX8j8'; // Full publishable key from your settings
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let myTasks = [];
+    let myCompletions = new Set();
+    let directReports = [];
+
+    // 2. AUTHENTICATION HANDLERS
+    async function checkSession() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        currentUser = session.user;
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+        document.getElementById('user-name').innerText = currentUser.email.split('@')[0];
+        initApp();
+      } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app-screen').classList.add('hidden');
+      }
+    }
+
+    async function signIn() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) showAuthError(error.message);
+      else checkSession();
+    }
+
+    async function signUp() {
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const { error } = await sb.auth.signUp({ email, password });
+      if (error) showAuthError(error.message);
+      else checkSession();
+    }
+
+    async function signOut() {
+      await sb.auth.signOut();
+      window.location.reload();
+    }
+
+    function showAuthError(msg) {
+      const el = document.getElementById('auth-msg');
+      el.innerText = msg;
+      el.classList.remove('hidden');
+    }
+
+    // 3. CORE LOGIC & SYNC
+    async function initApp() {
+      lucide.createIcons();
+      updateDateDisplay();
+      await fetchUserData();
+      subscribeRealtime();
+    }
+
+    function updateDateDisplay() {
+      const now = new Date();
+      const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+      document.getElementById('current-date-display').innerText = now.toLocaleDateString('en-US', options).toUpperCase();
+    }
+
+    async function fetchUserData() {
+      // Fetch Tasks
+      const { data: tasks } = await sb.from('tasks').select('*').order('created_at', { ascending: true });
+      myTasks = tasks || [];
+
+      // Fetch Today's Completions
+      const todayKey = getTodayPeriodKey('daily');
+      const { data: comps } = await sb.from('completions').select('task_id').like('period_key', `${todayKey}%`);
+      myCompletions = new Set((comps || []).map(c => c.task_id));
+
+      // Fetch direct reports assigned to this manager
+      const { data: reports } = await sb.from('team_members')
+        .select('member_id, profiles!team_members_member_id_fkey(id, email, full_name)')
+        .eq('manager_id', currentUser.id);
+
+      directReports = reports || [];
+
+      renderDesk();
+      renderManagerSquad();
+    }
+
+    function getTodayPeriodKey(cadence) {
+      const now = new Date();
+      if (cadence === 'daily') return `D${now.toISOString().split('T')[0]}`;
+      return `D${now.toISOString().split('T')[0]}`;
+    }
+
+    function renderDesk() {
+      // 1. Render Daily Routines with 5-Weekday Habit Squares
+      const dailyContainer = document.getElementById('daily-tasks-list');
+      const dailyTasks = myTasks.filter(t => t.cadence === 'daily' && t.user_id === currentUser.id);
+      
+      dailyContainer.innerHTML = dailyTasks.map(task => {
+        const isDoneToday = myCompletions.has(task.id);
+        return `
+          <div class="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-100 transition">
+            <span class="text-sm font-medium ${isDoneToday ? 'line-through text-desk-muted' : ''}">${task.title}</span>
+            <div class="flex items-center gap-1 font-mono text-[10px]">
+              ${[1, 2, 3, 4, 5].map(day => `
+                <button onclick="toggleHabit('${task.id}')" class="w-6 h-6 rounded flex items-center justify-center border transition ${isDoneToday ? 'bg-brand-teal text-white border-brand-teal' : 'bg-slate-100 dark:bg-slate-800 text-desk-muted border-slate-200 dark:border-slate-700'}">
+                  ${['M', 'T', 'W', 'T', 'F'][day - 1]}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('') || '<p class="text-xs text-desk-muted py-2">No daily routines configured yet.</p>';
+
+      // 2. Render Weekly Focus
+      const weeklyContainer = document.getElementById('weekly-tasks-list');
+      const weeklyTasks = myTasks.filter(t => t.cadence === 'weekly' && t.user_id === currentUser.id);
+      weeklyContainer.innerHTML = weeklyTasks.map(task => `
+        <div class="flex items-center gap-2 text-xs py-1">
+          <input type="checkbox" onchange="toggleHabit('${task.id}')" ${myCompletions.has(task.id) ? 'checked' : ''} class="rounded text-brand-teal focus:ring-0">
+          <span class="${myCompletions.has(task.id) ? 'line-through text-desk-muted' : ''}">${task.title}</span>
+        </div>
+      `).join('') || '<p class="text-[11px] text-desk-muted">No weekly targets.</p>';
+
+      // 3. Render Monthly Milestones
+      const monthlyContainer = document.getElementById('monthly-tasks-list');
+      const monthlyTasks = myTasks.filter(t => t.cadence === 'monthly' && t.user_id === currentUser.id);
+      monthlyContainer.innerHTML = monthlyTasks.map(task => `
+        <div class="flex items-center gap-2 text-xs py-1">
+          <input type="checkbox" onchange="toggleHabit('${task.id}')" ${myCompletions.has(task.id) ? 'checked' : ''} class="rounded text-brand-teal focus:ring-0">
+          <span class="${myCompletions.has(task.id) ? 'line-through text-desk-muted' : ''}">${task.title}</span>
+        </div>
+      `).join('') || '<p class="text-[11px] text-desk-muted">No monthly milestones.</p>';
+
+      // 4. Render Ad-hoc Priorities
+      const adhocContainer = document.getElementById('adhoc-tasks-list');
+      const adhocTasks = myTasks.filter(t => t.cadence === 'adhoc' && t.user_id === currentUser.id);
+      adhocContainer.innerHTML = adhocTasks.map(task => `
+        <div class="flex items-center justify-between p-2.5 rounded-lg border border-desk-border dark:border-desk-darkborder bg-slate-50/50 dark:bg-slate-800/40">
+          <div class="flex items-center gap-2.5">
+            <input type="checkbox" onchange="toggleHabit('${task.id}')" ${myCompletions.has(task.id) ? 'checked' : ''} class="w-4 h-4 rounded text-brand-teal focus:ring-0">
+            <div>
+              <div class="text-sm font-medium ${myCompletions.has(task.id) ? 'line-through text-desk-muted' : ''}">${task.title}</div>
+              ${task.created_by && task.created_by !== currentUser.id ? `<span class="text-[10px] bg-brand-teal-light text-brand-teal px-1.5 py-0.5 rounded font-mono">Assigned by Manager</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('') || '<p class="text-xs text-desk-muted">No pending priorities.</p>';
+    }
+
+    function renderManagerSquad() {
+      const roster = document.getElementById('reps-roster');
+      if (directReports.length === 0) {
+        roster.innerHTML = `
+          <div class="border border-dashed border-desk-border dark:border-desk-darkborder rounded-xl p-6 text-center">
+            <p class="text-xs text-desk-muted mb-2">No direct reports linked yet.</p>
+            <button onclick="openInviteModal()" class="text-xs text-brand-teal font-medium hover:underline">+ Add direct report email</button>
+          </div>
+        `;
+        return;
+      }
+
+      roster.innerHTML = directReports.map(rep => {
+        const report = rep.profiles;
+        const repTasks = myTasks.filter(t => t.user_id === report.id);
+
+        return `
+          <div class="border border-desk-border dark:border-desk-darkborder rounded-xl p-4 bg-slate-50/30 dark:bg-slate-800/20">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-heading font-bold text-sm">${report.full_name || report.email}</span>
+              <span class="text-[10px] font-mono text-desk-muted">${report.email}</span>
+            </div>
+            
+            <div class="space-y-1.5 mb-3">
+              ${repTasks.map(t => `
+                <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100 dark:border-slate-800">
+                  <span class="${myCompletions.has(t.id) ? 'line-through text-desk-muted' : ''}">${t.title}</span>
+                  <span class="text-[9px] font-mono text-brand-teal">${t.is_shared ? 'Shared' : 'Private'}</span>
+                </div>
+              `).join('') || '<p class="text-[11px] text-desk-muted italic">No items assigned.</p>'}
+            </div>
+
+            <div class="flex gap-1.5">
+              <input type="text" id="assign-input-${report.id}" placeholder="Assign talking point or task..." class="flex-1 text-xs bg-white dark:bg-slate-800 border border-desk-border dark:border-desk-darkborder rounded px-2 py-1 focus:outline-none">
+              <button onclick="assignTaskToRep('${report.id}')" class="bg-brand-teal text-white px-2.5 py-1 rounded text-xs font-medium">Assign</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 4. TASK & COMPLETION ACTIONS
+    async function addTask(cadence) {
+      const input = document.getElementById(`new-${cadence}-input`);
+      const title = input.value.trim();
+      if (!title) return;
+
+      await sb.from('tasks').insert({
+        user_id: currentUser.id,
+        created_by: currentUser.id,
+        title: title,
+        cadence: cadence,
+        is_shared: true
+      });
+
+      input.value = '';
+      fetchUserData();
+    }
+
+    async function assignTaskToRep(repId) {
+      const input = document.getElementById(`assign-input-${repId}`);
+      const title = input.value.trim();
+      if (!title) return;
+
+      await sb.from('tasks').insert({
+        user_id: repId,
+        created_by: currentUser.id,
+        title: title,
+        cadence: 'adhoc',
+        is_shared: true
+      });
+
+      input.value = '';
+      fetchUserData();
+    }
+
+    async function toggleHabit(taskId) {
+      const periodKey = `${getTodayPeriodKey('daily')}_${taskId}`;
+      if (myCompletions.has(taskId)) {
+        await sb.from('completions').delete().eq('id', periodKey);
+        myCompletions.delete(taskId);
+      } else {
+        await sb.from('completions').insert({
+          id: periodKey,
+          task_id: taskId,
+          completed_by: currentUser.id,
+          period_key: getTodayPeriodKey('daily')
+        });
+        myCompletions.add(taskId);
+      }
+      renderDesk();
+      renderManagerSquad();
+    }
+
+    // 5. MODAL ACTIONS
+    function openInviteModal() { document.getElementById('invite-modal').classList.remove('hidden'); }
+    function closeInviteModal() { document.getElementById('invite-modal').classList.add('hidden'); }
+
+    async function assignDirectReport() {
+      const email = document.getElementById('invite-email').value.trim();
+      if (!email) return;
+
+      // Find user profile by email
+      const { data: userProfile } = await sb.from('profiles').select('id').eq('email', email).single();
+      if (!userProfile) {
+        alert('User must create an account first before they can be linked to your squad.');
+        return;
+      }
+
+      await sb.from('team_members').insert({
+        manager_id: currentUser.id,
+        member_id: userProfile.id
+      });
+
+      closeInviteModal();
+      document.getElementById('invite-email').value = '';
+      fetchUserData();
+    }
+
+    // 6. REALTIME SUBSCRIPTION
+    function subscribeRealtime() {
+      sb.channel('realtime-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => fetchUserData())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'completions' }, () => fetchUserData())
+        .subscribe();
+    }
+
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    // Boot Check
+    checkSession();
+  </script>
+</body>
+</html>
