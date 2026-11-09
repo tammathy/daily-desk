@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Desk | DD Holdings</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase Client JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['"Familjen Grotesk"', 'sans-serif'],
+            body: ['"Public Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              teal: '#167a68',
+              'teal-dark': '#105e50',
+              'teal-light': '#e8f5f2',
+              'teal-muted': '#2a9d8f',
+              red: '#b5452c',
+              'red-light': '#fdf2f0',
+            },
+            desk: {
+              bg: '#f8fafc',
+              card: '#ffffff',
+              border: '#e2e8f0',
+              text: '#0f172a',
+              muted: '#64748b',
+              darkbg: '#0f172a',
+              darkcard: '#1e293b',
+              darkborder: '#334155'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Public Sans', sans-serif; }
+    h1, h2, h3, h4, .font-heading { font-family: 'Familjen Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark .custom-scroll::-webkit-scrollbar-thumb { background: #475569; }
+  </style>
+</
